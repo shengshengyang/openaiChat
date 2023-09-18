@@ -5,3 +5,4 @@ numpy
 python-dotenv
 flask
 openpyxl
+gunicorn
