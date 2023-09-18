@@ -1,6 +1,9 @@
 #!/bin/bash
-# Build the Docker image
+# start Docker daemon
+sudo systemctl start docker
+
+# build the Docker image
 docker build -t openaichat .
 
-# Run the Docker container
-docker run -d -p 80:80 openaiChat
+# run the Docker container
+docker run -p 4000:80 openaichat
