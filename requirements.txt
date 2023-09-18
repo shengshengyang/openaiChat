@@ -1,4 +1,4 @@
-pandas==2.1.0
+pandas
 requests~=2.31.0
 faiss-cpu
 numpy==1.26.0
