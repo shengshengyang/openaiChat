@@ -17,5 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # Run queryConnectOpenAiApi.py when the container launches
-CMD ["gunicorn", "-b", "0.0.0.0:80", "queryConnectOpenAiApi:app"]
-
+CMD ["python3", "queryConnectOpenAiApi.py"]
