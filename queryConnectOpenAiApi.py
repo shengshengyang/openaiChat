@@ -15,6 +15,7 @@ index = faiss.read_index('index.faiss')
 title_vectors = np.load('title_vectors.npy')
 load_dotenv()
 
+
 @app.route('/query', methods=['POST'])
 def handle_query():
     # Extract account and password from the request
@@ -26,7 +27,6 @@ def handle_query():
 
     if expected_password != os.getenv("PASSWORD"):
         return jsonify({'error': 'wrong password'}), 401
-
 
     query = request.json['query']
 
@@ -84,6 +84,6 @@ def handle_query():
         'generated_response': generated_response
     })
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
-
