@@ -26,7 +26,7 @@ def clean_and_reinput(data_path, index_path, vectors_path):
         title_vectors = []
         for _, row in data.iterrows():
             # Get the title text
-            title = row['title']
+            title = row['question']
 
             # Prepare the request payload
             payload = {
