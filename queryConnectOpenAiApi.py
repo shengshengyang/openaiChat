@@ -6,11 +6,6 @@ import requests
 import os
 import json
 from dotenv import load_dotenv
-import logging
-
-# Set up logging
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -83,8 +78,6 @@ def handle_query():
         generated_response = response.json()["choices"][0]["message"]["content"]
     else:
         generated_response = "No response choices found."
-
-    logger.info(f"Response: {generated_response}")
 
     return jsonify({
         'matched_data': json.loads(top_results_str),
