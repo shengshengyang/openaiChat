@@ -10,4 +10,4 @@ docker system prune -a -f
 docker build -t openaichat .
 
 # run the Docker container and log its output
-docker run -p 4000:80 openaichat >> app.log
+docker run -p 4000:4000 openaichat >> app.log
