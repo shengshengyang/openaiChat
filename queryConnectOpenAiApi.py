@@ -65,7 +65,7 @@ def handle_query():
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": "以下為json array 格式的參考資料: " + top_results_str},
                 {"role": "assistant", "content": "您好，請問需要我為這些資料做什麼?"},
-                {"role": "user", "content": "請根據提供的參考資料，回答以下問題應該要找哪一位人員回答:" + query
+                {"role": "user", "content": "請根據提供的參考資料，回答以下問題:" + query
                                             + ",若資料沒有能夠回答問題請以下列字句回復: 目前尚無資料，請洽客服"}
             ],
             "temperature": 1,
