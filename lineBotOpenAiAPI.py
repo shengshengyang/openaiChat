@@ -1,82 +1,54 @@
-from flask import Flask, request, jsonify, abort
+import json
+import os
 import faiss
 import numpy as np
 import pandas as pd
 import requests
-import os
-import json
 from dotenv import load_dotenv
+from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import TextSendMessage
 
 app = Flask(__name__)
 
 # Load data and Faiss index
-data = pd.read_excel('phone2.xlsx')
-index = faiss.read_index('index.faiss')
-title_vectors = np.load('title_vectors.npy')
+try:
+    data = pd.read_excel('phone2.xlsx')
+    index = faiss.read_index('index.faiss')
+    title_vectors = np.load('title_vectors.npy')
+except FileNotFoundError as e:
+    print(f"File not found: {e}")
+    exit(1)
 load_dotenv()
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
 
-@app.route("/callback", methods=['POST'])
-def callback():
-    signature = request.headers['X-Line-Signature']
-
+@app.route("/", methods=['POST'])
+def linebot():
     body = request.get_data(as_text=True)
+    json_data = json.loads(body)
+    print(json_data)
     try:
+        signature = request.headers['X-Line-Signature']
         handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
-
+        tk = json_data['events'][0]['replyToken']
+        msg = json_data['events'][0]['message']['text']
+        # 取出文字的前五個字元，轉換成小寫
+        ai_msg = msg[:6].lower()
+        # 取出文字的前五個字元是 hi ai:
+        if ai_msg == 'hi ai:':
+            reply_msg = generate_response(msg[6:])
+        else:
+            reply_msg = msg
+        text_message = TextSendMessage(text=reply_msg)
+        line_bot_api.reply_message(tk, text_message)
+    except Exception as e:
+        print(f"Error: {e}")
     return 'OK'
 
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    text = event.message.text
-    if text.lower().startswith('hi zero'):
-        generated_response = generate_response(text[7:])  # Skip the "hi zero" part
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=generated_response))
-
-
-def handle_query():
-    # Extract account and password from the request
-    expected_account = request.json['account']
-    expected_password = request.json['password']
-
-    if expected_account != os.getenv("ACCOUNT"):
-        return jsonify({'error': 'account not found'}), 401
-
-    if expected_password != os.getenv("PASSWORD"):
-        return jsonify({'error': 'wrong password'}), 401
-
-    query = request.json['query']
-    generated_response = generate_response(query)
-
-    return jsonify({
-        'generated_response': generated_response
-    })
-
-
 def generate_response(query):
-    # Extract account and password from the request
-    expected_account = request.json['account']
-    expected_password = request.json['password']
-
-    if expected_account != os.getenv("ACCOUNT"):
-        return jsonify({'error': 'account not found'}), 401
-
-    if expected_password != os.getenv("PASSWORD"):
-        return jsonify({'error': 'wrong password'}), 401
-
-    query = request.json['query']
-
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {os.getenv("OPENAI_KEY")}'
