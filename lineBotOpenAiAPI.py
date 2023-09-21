@@ -44,9 +44,10 @@ def linebot():
             reply_msg = msg
         text_message = TextSendMessage(text=reply_msg)
         line_bot_api.reply_message(tk, text_message)
-    except Exception as e:
-        print(f"Error: {e}")
+    except Exception as exception:
+        print(f"Error: {exception}")
     return 'OK'
+
 
 def generate_response(query):
     headers = {
