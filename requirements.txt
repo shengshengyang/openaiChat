@@ -1,9 +1,10 @@
-pandas
-requests
+pandas~=2.1.0
+requests~=2.31.0
 faiss-cpu
-numpy
-python-dotenv
-flask
+numpy~=1.26.0
+python-dotenv~=1.0.0
+flask~=2.3.3
 openpyxl
 gunicorn
 line-bot-sdk
+Office365-REST-Python-Client

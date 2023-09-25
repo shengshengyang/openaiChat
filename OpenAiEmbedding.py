@@ -4,6 +4,36 @@ import requests
 import faiss
 import numpy as np
 from dotenv import load_dotenv
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
+from office365.sharepoint.files.file import File
+
+# Load environment variables
+load_dotenv()
+
+# Get SharePoint site and credentials
+sharepoint_url = os.getenv("SHAREPOINT_BASIC_URL")
+username = os.getenv("SHAREPOINT_USERNAME")
+password = os.getenv("SHAREPOINT_PASSWORD")
+
+# Authenticate with SharePoint
+auth_ctx = AuthenticationContext(sharepoint_url)
+if auth_ctx.acquire_token_for_user(username, password):
+    # Create client context
+    ctx = ClientContext(sharepoint_url, auth_ctx)
+
+    # Specify relative url of file
+    relative_url = os.getenv("SHAREPOINT_IT_BOT_URL")
+
+    # Download file
+    download_path = "./phone1.xlsx"
+    file_content = File.open_binary(ctx, relative_url)
+    with open(download_path, "wb") as local_file:
+        local_file.write(file_content.content)
+
+    print(f"File downloaded to: {download_path}")
+else:
+    print(auth_ctx.get_last_error())
 
 def clean_and_reinput(data_path, index_path, vectors_path):
     # Delete existing index and vectors files if they exist
