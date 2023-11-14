@@ -24,7 +24,7 @@ def process_query(query):
     }
     response = requests.post('https://api.openai.com/v1/embeddings', headers=headers, json=query_data)
     response_data = response.json()
-    query_vector = np.array(response_data['data'][0]['embedding'])
+    query_vector = np.array(response_data.get('data', [])[0].get('embedding', []))
 
     k = 5
     distances, indices = index.search(np.array([query_vector]), k)
