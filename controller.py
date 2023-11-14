@@ -21,6 +21,7 @@ def login():
         return jsonify({'error': 'wrong password'}), 401
 
     access_token = create_access_token(identity=expected_account)
+    print(expected_account + 'is login')
     return jsonify(access_token=access_token), 200
 
 
