@@ -28,6 +28,10 @@
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+        <div id="progressBar" class="progress" style="display: none;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0"
+                 aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+        </div>
         <h3>Response:</h3>
         <div id="response"></div>
     </div>
@@ -74,24 +78,51 @@
             var queryData = {
                 query: query
             };
-
             $.ajax({
-                url: '/query',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(queryData),
-                beforeSend: function(xhr) {
-                    // Add the JWT token to the request header
-                    var token = localStorage.getItem('access_token');
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-                },
-                success: function(response) {
-                    console.log('Query successful');
-                    $('#response').text(response.generated_response);
-                },
-                error: function(error) {
-                    console.error('Query failed:', error.responseJSON.error);
-                }
+              url: '/query',
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(queryData),
+              beforeSend: function(xhr) {
+                // Add the JWT token to the request header
+                var token = localStorage.getItem('access_token');
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+
+                // Show the progress bar
+                $('#progressBar').show();
+              },
+              xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                // Listen to the progress event
+                xhr.upload.addEventListener("progress", function(evt) {
+                  if (evt.lengthComputable) {
+                    var percentComplete = (evt.loaded / evt.total) * 100;
+                    // Slow down the progress by adding a delay
+                    var delay = 1000; // milliseconds
+                    setTimeout(function() {
+                      // Update the progress bar
+                      $('.progress-bar').css('width', percentComplete + '%');
+                      $('.progress-bar').attr('aria-valuenow', percentComplete);
+                    }, delay);
+                  }
+                }, false);
+                return xhr;
+              },
+              success: function(response) {
+                console.log('Query successful');
+                // Delay displaying the response to match the progress bar completion
+                var delay = 1000; // milliseconds
+                setTimeout(function() {
+                  $('#response').text(response.generated_response);
+                }, delay);
+              },
+              error: function(error) {
+                console.error('Query failed:', error.responseJSON.error);
+              },
+              complete: function() {
+                // Hide the progress bar when the request is complete
+                $('#progressBar').hide();
+              }
             });
         });
     });
