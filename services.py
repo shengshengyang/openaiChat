@@ -33,9 +33,8 @@ def process_query(query):
     def replace_none_with_na(value):
         return '無' if pd.isnull(value) else value
 
-    matched_data = matched_data.map(replace_none_with_na)
+    matched_data = matched_data.applymap(replace_none_with_na)
     top_results_str = json.dumps(json.loads(matched_data.to_json(orient='records')), ensure_ascii=False)
-    print(top_results_str)
 
     api_endpoint = "https://api.openai.com/v1/chat/completions"
     system_prompt = os.getenv("SYSTEM_PROMPT")
