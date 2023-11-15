@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login and Query</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Login</h1>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="account">Account:</label>
+            <input type="text" class="form-control" id="account" name="account" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <div id="querySection" style="display: none;">
+        <h2>Query</h2>
+        <form id="queryForm">
+            <div class="form-group">
+                <label for="query">Enter your query:</label>
+                <input type="text" class="form-control" id="query" name="query" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <h3>Response:</h3>
+        <div id="response"></div>
+    </div>
+</div>
+
+
+<!-- Include Bootstrap JavaScript -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Submit login form
+        $('#loginForm').submit(function(event) {
+            event.preventDefault();
+            var account = $('#account').val();
+            var password = $('#password').val();
+            var loginData = {
+                account: account,
+                password: password
+            };
+
+            $.ajax({
+                url: '/login',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(loginData),
+                success: function(response) {
+                    console.log('Login successful');
+                    $('#loginForm').hide();
+                    $('#querySection').show();
+                    // Store the access token in local storage
+                    localStorage.setItem('access_token', response.access_token);
+                },
+                error: function(error) {
+                    console.error('Login failed:', error.responseJSON.error);
+                }
+            });
+        });
+
+        // Submit query form
+        $('#queryForm').submit(function(event) {
+            event.preventDefault();
+            var query = $('#query').val();
+            var queryData = {
+                query: query
+            };
+
+            $.ajax({
+                url: '/query',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(queryData),
+                beforeSend: function(xhr) {
+                    // Add the JWT token to the request header
+                    var token = localStorage.getItem('access_token');
+                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                },
+                success: function(response) {
+                    console.log('Query successful');
+                    $('#response').text(response.generated_response);
+                },
+                error: function(error) {
+                    console.error('Query failed:', error.responseJSON.error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

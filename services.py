@@ -35,6 +35,7 @@ def process_query(query):
 
     matched_data = matched_data.map(replace_none_with_na)
     top_results_str = json.dumps(json.loads(matched_data.to_json(orient='records')), ensure_ascii=False)
+    print(top_results_str)
 
     api_endpoint = "https://api.openai.com/v1/chat/completions"
     system_prompt = os.getenv("SYSTEM_PROMPT")
@@ -58,7 +59,8 @@ def process_query(query):
             "n": 1
         }
     )
-
+    print("Request JSON:", response.request.body)
+    print("Request JSON:", response.json())
     if 'choices' in response.json():
         generated_response = response.json()["choices"][0]["message"]["content"]
     else:

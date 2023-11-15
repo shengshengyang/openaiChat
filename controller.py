@@ -21,8 +21,13 @@ def index():
     return render_template('index.html', qa_list=qa_list)
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/')
 def login():
+    return render_template('query.html')
+
+
+@app.route('/login', methods=['POST'])
+def show_login():
     expected_account = request.json.get('account', None)
     expected_password = request.json.get('password', None)
 
