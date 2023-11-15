@@ -8,3 +8,4 @@ openpyxl
 gunicorn
 line-bot-sdk
 Office365-REST-Python-Client
+flask-jwt-extended

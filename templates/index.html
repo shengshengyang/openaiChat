@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QA Data</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .qa-container {
+            margin-top: 20px;
+        }
+        .qa-question {
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="qa-container">
+            {% for qa in qa_list %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title qa-question" data-toggle="collapse" data-target="#qa-{{ loop.index }}">{{ qa['question'] }}</h5>
+                    </div>
+                    <div id="qa-{{ loop.index }}" class="collapse">
+                        <div class="card-body">
+                            <p class="card-text">{{ qa['answer'] }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Add event listeners to question headings
+        var questionHeadings = document.querySelectorAll('.qa-question');
+        questionHeadings.forEach(function(heading) {
+            heading.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-target');
+                var target = document.querySelector(targetId);
+                target.classList.toggle('show');
+            });
+        });
+
+        // Check URL for anchor and show corresponding answer section
+        document.addEventListener('DOMContentLoaded', function() {
+            var url = window.location.href;
+            if (url.includes('#qa-')) {
+                var targetId = url.substring(url.indexOf('#'));
+                var target = document.querySelector(targetId);
+                if (target) {
+                    target.classList.add('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

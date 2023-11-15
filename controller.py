@@ -1,12 +1,24 @@
 # Python Flask code
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from services import process_query
 import os
+import pandas as pd
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Change this!
 jwt = JWTManager(app)
+
+
+@app.route('/index')
+def index():
+    data = pd.read_excel('phone2.xlsx')
+    qa_list = []
+    for _, row in data.iterrows():
+        question = row['question']
+        answer = row['answer']
+        qa_list.append({'question': question, 'answer': answer})
+    return render_template('index.html', qa_list=qa_list)
 
 
 @app.route('/login', methods=['POST'])
@@ -35,4 +47,4 @@ def handle_query():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4000)
+    app.run(host='0.0.0.0', port=4000, debug=True)
