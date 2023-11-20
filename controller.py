@@ -1,13 +1,17 @@
 # Python Flask code
 from flask import Flask, request, jsonify, render_template
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+from flask_restful import Api, Resource
 from services import process_query
 import os
 import pandas as pd
+from flasgger import Swagger
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Change this!
+api = Api(app)
 jwt = JWTManager(app)
+swagger = Swagger(app)
 
 
 @app.route('/index')
@@ -50,6 +54,51 @@ def handle_query():
 
     return jsonify(result)
 
+
+class IndexResource(Resource):
+    def get(self):
+        """
+        Get the index page
+        ---
+        responses:
+          200:
+            description: Index page
+        """
+        # Your index resource logic here
+        return "Index page"
+
+
+class LoginResource(Resource):
+    def post(self):
+        """
+        Show login
+        ---
+        parameters:
+          - name: account
+            in: query
+            type: string
+            required: true
+            description: Account
+          - name: password
+            in: query
+            type: string
+            required: true
+            description: Password
+        responses:
+          200:
+            description: Login successful
+          401:
+            description: Unauthorized
+        """
+        # Your login resource logic here
+        return "Login successful"
+
+
+# Define other API resources in a similar manner
+
+
+api.add_resource(IndexResource, '/index')
+api.add_resource(LoginResource, '/login')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4000, debug=True)
