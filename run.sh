@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Stop the existing Docker container running on port 80
+docker stop $(docker ps -q --filter "publish=80")
+
+# Remove the existing Docker container running on port 80
+docker rm $(docker ps -aq --filter "publish=80")
+
 # start Docker daemon
 sudo systemctl start docker
 
