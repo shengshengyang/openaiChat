@@ -13,7 +13,7 @@ title_vectors = np.load('title_vectors.npy')
 load_dotenv()
 
 
-def process_query(query):
+def query_closest(query):
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {os.getenv("OPENAI_KEY_1")}'
@@ -35,9 +35,17 @@ def process_query(query):
 
     matched_data = matched_data.applymap(replace_none_with_na)
     top_results_str = json.dumps(json.loads(matched_data.to_json(orient='records')), ensure_ascii=False)
+    # Convert the JSON string back to a dictionary
+    return {'matchData': top_results_str}
+
+
+def process_query(query):
+    top_results = query_closest(query)
+    top_results_str = json.dumps(top_results['matchData'], ensure_ascii=False)
 
     api_endpoint = "https://api.openai.com/v1/chat/completions"
     system_prompt = os.getenv("SYSTEM_PROMPT")
+
     response = requests.post(
         api_endpoint,
         headers={
@@ -50,22 +58,23 @@ def process_query(query):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": "以下為json array 格式的參考資料: " + top_results_str},
                 {"role": "assistant", "content": "您好，請問需要我為這些資料做什麼?"},
-                {"role": "user", "content": "請根據提供的參考資料，回答以下問題:" + query
-                                            + ",若資料沒有能夠回答問題請以下列字句回復: 目前尚無資料，請洽客服"}
+                {"role": "user", "content": "請根據提供的參考資料，回答以下問題:" + query + ",若資料沒有能夠回答問題請以下列字句回復: 目前尚無資料，請洽客服"}
             ],
             "temperature": 1,
             "top_p": 1,
             "n": 1
         }
     )
+
     print("Request JSON:", response.request.body)
     print("Request JSON:", response.json())
+
     if 'choices' in response.json():
         generated_response = response.json()["choices"][0]["message"]["content"]
     else:
         generated_response = "No response choices found."
 
     return {
-        'matched_data': json.loads(top_results_str),
+        'matched_data': top_results['matchData'],
         'generated_response': generated_response
     }

@@ -2,7 +2,7 @@
 from flask import Flask, request, jsonify, render_template
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_restful import Api, Resource
-from services import process_query
+from services import process_query, query_closest
 import os
 import pandas as pd
 from flasgger import Swagger
@@ -103,8 +103,7 @@ responses:
             properties:
               answer:
                 type: string
-                description: The answer to the question
-              question:
+                description: The answer to the question:
                 type: string
                 description: The question asked
   401:
@@ -117,21 +116,12 @@ responses:
     return jsonify(result)
 
 
-class IndexResource(Resource):
-    def get(self):
-        """
-        Get the index page
-        ---
-        responses:
-          200:
-            description: Index page
-        """
-        return "Index page"
+@app.route('/query/closest', methods=['POST'])
+def handle_query_closest():
+    query = request.json['query']
+    result = query_closest(query)
+    return jsonify(result)
 
-# Define other API resources in a similar manner
-
-
-api.add_resource(IndexResource, '/index')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4000, debug=True)
