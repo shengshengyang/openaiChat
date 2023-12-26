@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.7-slim-buster
+FROM python:3.11-slim-buster
 
 # Set the working directory in the container to /app
 WORKDIR /app
@@ -13,9 +13,8 @@ RUN pip install --upgrade pip
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 80 available to the world outside this container
-EXPOSE 8083
+# Make port 4000 available to the world outside this container
+EXPOSE 4000
 
 # Run queryConnectOpenAiApi.py when the container launches
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "controller:app"]
-
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:4000", "controller:app"]
