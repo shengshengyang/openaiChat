@@ -10,4 +10,4 @@ docker rm $(docker ps -aq --filter "publish=4000")
 docker build -t openaichat .
 
 # run the Docker container and log its output
-docker run -p 4000:4000 openaichat >> app.log
+docker run -d -p 4000:4000 openaichat >> app.log
